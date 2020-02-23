@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ThreeJS Point Cloud Example</title>
+	<link rel="stylesheet" type="text/css" href="style/style.css">
+</head>
+<body>
+	<div id="canvas"></div>
+	<form>
+		<button type="button" id="init">Init</button>
+		<input id="file" type="file" name="file">
+		<button type="button" id="update" disabled>Render</button>
+	</form>
+	
+	<script src="../lib/three.js"></script>
+	<script src="../lib/three.module.js"></script>
+	<script src="../lib/OrbitControls.js"></script>
+	<script src="../lib/stats.min.js"></script>
+	<script src="script/render.js"></script>
+	<script src="script/readFromFile.js"></script>
+	
+</body>
+</html>
