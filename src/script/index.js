@@ -1,4 +1,4 @@
-const DOMInput = {
+export const DOMInput = {
 	'init': document.getElementById( 'init' ),
 	'update': document.getElementById( 'update' ),
 	'compare': document.getElementById( 'compare' ),
@@ -6,15 +6,15 @@ const DOMInput = {
 	'file2': document.getElementById( 'file2' )
 }
 
-function disableBtn( obj ) {
+export function disableBtn( obj ) {
 	if( !obj.hasAttribute( 'disabled' ) )
 		obj.setAttribute( 'disabled', 'disabled' );
 }
 
-function enableBtn( obj ) {
+export function enableBtn( obj ) {
 	if( obj.hasAttribute( 'disabled' ) )
 		obj.removeAttribute( 'disabled' );
 }
 
-const clouds = [];
-const lines = [];
+export const clouds = [];
+export const lines = [];

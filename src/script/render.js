@@ -1,3 +1,7 @@
+import * as THREE from '../../build/three.module.js';
+import { OrbitControls } from '../../lib/OrbitControls.js';
+import {DOMInput, disableBtn, enableBtn } from './index.js';
+
 let canvasWidth  = 500;
 let canvasHeight = 500;
 let renderer;
@@ -5,36 +9,7 @@ let container;
 let camera;
 let scene;
 let group;
-
-
-let vertexShader = `
-
-uniform mat4 modelViewMatrix;
-uniform mat4 projectionMatrix;
-
-attribute vec3 position;
-attribute vec3 color;
-
-varying vec3 v_color;
-
-void main(){
-	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-	gl_PointSize = 6.0;
-	v_color = color;
-}
-
-`;
-
-
-let fragmentShader = `
-precision highp float;
-varying vec3 v_color;
-
-void main(){
-	gl_FragColor = vec4( v_color, 255 );
-}
-
-`;
+let controls;
 
 
 function init() {
@@ -71,3 +46,5 @@ function animate() {
 }
 
 DOMInput.init.addEventListener( 'click', init );
+
+export { group };

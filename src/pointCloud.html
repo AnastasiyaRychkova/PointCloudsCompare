@@ -13,18 +13,15 @@
 		<label for="file1">First point cloud:</label>
 		<input id="file1" type="file" disabled>
 		<button type="button" id="update" disabled>Render</button>
-		<label for="file1">Second point cloud:</label>
+		<label for="file2">Second point cloud:</label>
 		<input id="file2" type="file" disabled>
 		<button type="button" id="compare" disabled>Compare</button>
 	</form>
 	
-	<script src="../build/three.js"></script>
-	<script src="../build/three.module.js"></script>
-	<script src="../lib/OrbitControls.js"></script>
-	<script src="script/index.js"></script>
-	<script src="script/render.js"></script>
-	<script src="script/readFromFile.js"></script>
-	<script src="script/compare.js"></script>
+	<script src="script/index.js" type='module'></script>
+	<script src="script/render.js" type='module'></script>
+	<script src="script/readFromFile.js" type='module'></script>
+	<script src="script/compare.js" type='module'></script>
 	
 </body>
 </html>

@@ -1,26 +1,29 @@
+import * as THREE from '../../build/three.module.js';
+import { DOMInput, clouds, lines, disableBtn } from './index.js';
+import { group } from './render.js';
+import Cloud from './readFromFile.js';
+
 class Lines
 {
 	constructor( cloud1, cloud2 ) {
 		if( cloud1.positions.length < cloud2.positions.length )
 			[ cloud1, cloud2 ] = [ cloud2, cloud1 ]; // swap
 		const pointCount = cloud1.positions.length;
-		this.positions = new Float32Array( pointCount );
-		this.colors = new Float32Array( pointCount );
+		this.positions = new Float32Array( pointCount * 2 );
+		this.colors = new Float32Array( pointCount * 2 );
 
 		this.compare( cloud1, cloud2 );
 
-		this.material = THREE.LineBasicMaterial( {
-			vertexColors: THREE.VertexColors,
-			blending: THREE.AdditiveBlending,
-			transparent: true
+		this.material = new THREE.LineBasicMaterial( {
+			vertexColors: THREE.VertexColors
 		} );
 
 		this.geometry = new THREE.BufferGeometry();
 
-		this.geometry.setAttribute('position', new THREE.BufferAttribute( new Float32Array( this.positions ), 3 ) );
-		this.geometry.setAttribute('color', new THREE.BufferAttribute( new Float32Array( this.colors ), 3 ) );
+		this.geometry.setAttribute('position', new THREE.BufferAttribute( this.positions, 3 ) );
+		this.geometry.setAttribute('color', new THREE.BufferAttribute( this.colors, 3 ) );
 
-		this.mesh = new THREE.LineSegments( geometry, material );
+		this.mesh = new THREE.LineSegments( this.geometry, this.material );
 		group.add( this.mesh );
 	};
 
@@ -58,6 +61,8 @@ class Lines
 				}
 			}
 
+			console.log( cloud1.positions[ i * 3 ], cloud1.positions[ i * 3 + 1 ], cloud1.positions[ i * 3 + 2 ], ' --- ', cloud2.positions[ minPoint * 3 ], cloud2.positions[ minPoint * 3 + 1 ], cloud2.positions[ minPoint * 3 + 2 ] );
+
 			// Вершины сегмента
 
 			this.positions[ vertexPos++ ] = cloud1.positions[ i * 3 ];
@@ -69,13 +74,13 @@ class Lines
 			this.positions[ vertexPos++ ] = cloud2.positions[ minPoint * 3 + 2 ];
 
 			// Цвет концов сегмента
-			this.positions[ colorPos++ ] = cloud1.colors[ i * 3 ];
-			this.positions[ colorPos++ ] = cloud1.colors[ i * 3 + 1 ];
-			this.positions[ colorPos++ ] = cloud1.colors[ i * 3 + 2 ];
+			this.colors[ colorPos++ ] = cloud1.colors[ i * 3 ];
+			this.colors[ colorPos++ ] = cloud1.colors[ i * 3 + 1 ];
+			this.colors[ colorPos++ ] = cloud1.colors[ i * 3 + 2 ]
 
-			this.positions[ colorPos++ ] = cloud2.colors[ minPoint * 3 ];
-			this.positions[ colorPos++ ] = cloud2.colors[ minPoint * 3 + 1 ];
-			this.positions[ colorPos++ ] = cloud2.colors[ minPoint * 3 + 2 ];
+			this.colors[ colorPos++ ] = 1.0;
+			this.colors[ colorPos++ ] = 1.0;
+			this.colors[ colorPos++ ] = 1.0;
 
 			// Позиция серединной точки
 			resCloudPos.push(
@@ -86,9 +91,9 @@ class Lines
 			
 			// Цвет серединной точки
 			resCloudCol.push(
-				0.5,
-				0.5,
-				0.5
+				0.66,
+				0.93,
+				0.31
 			);
 
 			clouds.push( new Cloud( resCloudPos, resCloudCol ) );
@@ -97,26 +102,7 @@ class Lines
 }
 
 
-/* DOMInput.compare.addEventListener( 'click', ( e ) => {
-	lines.push( new Lines( clouds[0], clouds[1] ) );
-}, { 'once': true } ); */
-
-let lMaterial, lGeometry, lMesh;
-
 DOMInput.compare.addEventListener( 'click', ( e ) => {
-	
-	lMaterial = THREE.LineBasicMaterial( {
-		vertexColors: THREE.VertexColors,
-		blending: THREE.AdditiveBlending,
-		transparent: true
-	} );
-
-	lGeometry = new THREE.BufferGeometry();
-
-	lGeometry.setAttribute('position', new THREE.BufferAttribute( new Float32Array( [ 0, 0, 0, 6, 6, 6 ] ), 3 ) );
-	lGeometry.setAttribute('color', new THREE.BufferAttribute( new Float32Array( [ 1, 1, 1, 1, 1, 1 ] ), 3 ) );
-
-	lMesh = new THREE.LineSegments( lGeometry, lMaterial );
-	group.add( lMesh );
-
+	lines.push( new Lines( clouds[0], clouds[1] ) );
+	disableBtn( DOMInput.compare );
 }, { 'once': true } );

@@ -1,7 +1,42 @@
+import * as THREE from '../../build/three.module.js';
+import { DOMInput, disableBtn, enableBtn, clouds } from './index.js';
+import { group } from './render.js';
+
 DOMInput.file1.addEventListener( 'change', fileInput );
 DOMInput.file2.addEventListener( 'change', fileInput );
 
-class Cloud
+
+let vertexShader = `
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+attribute vec3 position;
+attribute vec3 color;
+
+varying vec3 v_color;
+
+void main(){
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+	gl_PointSize = 6.0;
+	v_color = color;
+}
+
+`;
+
+
+let fragmentShader = `
+precision highp float;
+varying vec3 v_color;
+
+void main(){
+	gl_FragColor = vec4( v_color, 255 );
+}
+
+`;
+
+
+export default class Cloud
 {
 	constructor( pos, col ) {
 		this.positions = new Float32Array( pos );
