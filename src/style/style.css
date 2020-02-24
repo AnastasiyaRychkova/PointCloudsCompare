@@ -9,7 +9,12 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+form {
+	display: flex;
 	flex-direction: column;
+	margin-left: 16px;
 }
 
 div {
@@ -23,10 +28,11 @@ button {
 	background-color: e7e7e7;
 	text-decoration: none;
 	border: 2px solid #e7e7e7;
-	border-radius: 20px;
-	padding: 5px 32px;
+	border-radius: 15px;
 	text-align: center;
-	margin: 0 15px;
+	margin: 5px;
+	width: 110px;
+	height: 30px;
 }
 
 button:hover {
@@ -36,4 +42,17 @@ button:hover {
 button[disabled] {
 	background-color: white;
 	color: #e7e7e7;
+}
+
+input[type="file"] {
+	margin: 5px;
+	height: 30px;
+}
+
+label {
+	margin-top: 10px;
+	padding-left: 5px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	color: #949494;
 }

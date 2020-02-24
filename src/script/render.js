@@ -5,8 +5,10 @@ let container;
 let camera;
 let scene;
 let material;
+let pMaterial;
 let geometry;
 let mesh;
+let group;
 let bRender = false;
 
 
@@ -56,27 +58,38 @@ function init() {
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color( 0xe7e7e7 );
 
-	material = new THREE.RawShaderMaterial({
+	group = new THREE.Group();
+	scene.add( group );
+
+	/* material = new THREE.RawShaderMaterial({
 		vertexShader: vertexShader,
 		fragmentShader: fragmentShader
 	});
 
+	pMaterial = new THREE.PointsMaterial( {
+		vertexColors: THREE.VertexColors,
+		size: 3,
+		blending: THREE.AdditiveBlending,
+		transparent: true,
+		sizeAttenuation: false
+	} );
+
 	geometry = new THREE.BufferGeometry();
-	mesh = new THREE.Points( geometry, material );
-	scene.add( mesh );
+	mesh = new THREE.Points( geometry, pMaterial );
+	scene.add( mesh ); */
 	bRender = true;
 	animate();
-	document.getElementById( 'init' ).setAttribute( 'disabled', 'disabled' );
+	disableBtn( DOMInput.init );
+	enableBtn( DOMInput.file1 );
 }
 
 
 function animate() {
 	if( bRender ) {
-		mesh.rotation.y += 0.005;
+		group.rotation.y += 0.001;
 		renderer.render(scene, camera);
 	}
 	requestAnimationFrame(animate);
 }
 
-document.getElementById( 'init' ).addEventListener( 'click', init );
-
+DOMInput.init.addEventListener( 'click', init );

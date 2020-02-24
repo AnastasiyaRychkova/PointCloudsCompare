@@ -10,16 +10,21 @@
 	<div id="canvas"></div>
 	<form>
 		<button type="button" id="init">Init</button>
-		<input id="file" type="file" name="file">
+		<label for="file1">First point cloud:</label>
+		<input id="file1" type="file" disabled>
 		<button type="button" id="update" disabled>Render</button>
+		<label for="file1">Second point cloud:</label>
+		<input id="file2" type="file" disabled>
+		<button type="button" id="compare" disabled>Compare</button>
 	</form>
 	
 	<script src="../lib/three.js"></script>
 	<script src="../lib/three.module.js"></script>
 	<script src="../lib/OrbitControls.js"></script>
-	<script src="../lib/stats.min.js"></script>
+	<script src="script/index.js"></script>
 	<script src="script/render.js"></script>
 	<script src="script/readFromFile.js"></script>
+	<script src="script/compare.js"></script>
 	
 </body>
 </html>
