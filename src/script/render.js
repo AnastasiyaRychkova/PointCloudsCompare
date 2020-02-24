@@ -1,15 +1,10 @@
-const canvasWidth  = 500;
-const canvasHeight = 500;
+let canvasWidth  = 500;
+let canvasHeight = 500;
 let renderer;
 let container;
 let camera;
 let scene;
-let material;
-let pMaterial;
-let geometry;
-let mesh;
 let group;
-let bRender = false;
 
 
 let vertexShader = `
@@ -24,7 +19,7 @@ varying vec3 v_color;
 
 void main(){
 	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-	gl_PointSize = 8.0;
+	gl_PointSize = 6.0;
 	v_color = color;
 }
 
@@ -43,10 +38,12 @@ void main(){
 
 
 function init() {
-	renderer = new THREE.WebGLRenderer({ antialias: true });
-	renderer.setSize(canvasWidth, canvasHeight);
 	container = document.getElementById('canvas');
-	container.appendChild(renderer.domElement);
+	canvasWidth = container.clientWidth;
+	canvasHeight = container.clientHeight
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setSize( canvasWidth, canvasHeight );
+	container.appendChild( renderer.domElement );
 
 	// Камера
 	camera = new THREE.PerspectiveCamera(35, canvasWidth / canvasHeight, 1, 1000);
@@ -61,23 +58,6 @@ function init() {
 	group = new THREE.Group();
 	scene.add( group );
 
-	/* material = new THREE.RawShaderMaterial({
-		vertexShader: vertexShader,
-		fragmentShader: fragmentShader
-	});
-
-	pMaterial = new THREE.PointsMaterial( {
-		vertexColors: THREE.VertexColors,
-		size: 3,
-		blending: THREE.AdditiveBlending,
-		transparent: true,
-		sizeAttenuation: false
-	} );
-
-	geometry = new THREE.BufferGeometry();
-	mesh = new THREE.Points( geometry, pMaterial );
-	scene.add( mesh ); */
-	bRender = true;
 	animate();
 	disableBtn( DOMInput.init );
 	enableBtn( DOMInput.file1 );
@@ -85,10 +65,8 @@ function init() {
 
 
 function animate() {
-	if( bRender ) {
-		group.rotation.y += 0.001;
-		renderer.render(scene, camera);
-	}
+	group.rotation.y += 0.001;
+	renderer.render(scene, camera);
 	requestAnimationFrame(animate);
 }
 

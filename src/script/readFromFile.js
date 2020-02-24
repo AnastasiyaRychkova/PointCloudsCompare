@@ -6,17 +6,17 @@ class Cloud
 	constructor( pos, col ) {
 		this.positions = new Float32Array( pos );
 		this.colors = new Float32Array( col );
-		console.log( this.positions, this.colors );
 
-		this.material = material = new THREE.RawShaderMaterial({
+
+		this.material = new THREE.RawShaderMaterial({
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader
 		});
 
 		this.geometry = new THREE.BufferGeometry();
 
-		this.geometry.setAttribute('position', new THREE.BufferAttribute( new Float32Array( this.positions ), 3 ) );
-		this.geometry.setAttribute('color', new THREE.BufferAttribute( new Float32Array( this.colors ), 3 ) );
+		this.geometry.setAttribute('position', new THREE.BufferAttribute( this.positions, 3 ) );
+		this.geometry.setAttribute('color', new THREE.BufferAttribute( this.colors, 3 ) );
 
 		this.mesh = new THREE.Points( this.geometry, this.material );
 		group.add( this.mesh );
@@ -44,8 +44,9 @@ class Cloud
 	static parseTXT( fileText, res = { 'positions': [], 'colors': [] } ) {
 		if( fileText ) {
 			const rows = fileText.split( '\n' );
+			console.log( 'ROWS FROM FILE', rows );
 
-			for (const row of rows) {
+			for( const row of rows ) {
 				const numbers = row.split( ' ' );
 				if( numbers.length === 6 ) {
 					for( let i = 0; i < 3; i++ )
@@ -91,6 +92,7 @@ function fileInput( e ) {
 				return;
 			disableBtn( DOMInput[ 'file' + fNum ] );
 			enableBtn( DOMInput.update );
+
 
 			DOMInput.update.addEventListener( 'click', ( e ) => {
 				clouds[fNum - 1] = new Cloud( res.positions, res.colors );

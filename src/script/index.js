@@ -17,3 +17,4 @@ function enableBtn( obj ) {
 }
 
 const clouds = [];
+const lines = [];
