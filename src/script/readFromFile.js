@@ -1,11 +1,7 @@
-import * as THREE from '../../build/three.module.js';
-import { DOMInput, disableBtn, enableBtn, clouds } from './index.js';
-import { group } from './render.js';
-
 DOMInput.file1.addEventListener( 'change', fileInput );
 DOMInput.file2.addEventListener( 'change', fileInput );
 
-
+// Вершинный шейдер
 let vertexShader = `
 
 uniform mat4 modelViewMatrix;
@@ -24,7 +20,7 @@ void main(){
 
 `;
 
-
+// Фрагментный шейдер
 let fragmentShader = `
 precision highp float;
 varying vec3 v_color;
@@ -35,28 +31,34 @@ void main(){
 
 `;
 
-
-export default class Cloud
+// Облако точек
+class Cloud
 {
 	constructor( pos, col ) {
-		this.positions = new Float32Array( pos );
-		this.colors = new Float32Array( col );
+		this.positions = new Float32Array( pos ); // массив позиций точек
+		this.colors = new Float32Array( col ); // массив цветов точек
 
-
+		// Материал точек
 		this.material = new THREE.RawShaderMaterial({
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader
 		});
 
+		// Геометрия
 		this.geometry = new THREE.BufferGeometry();
 
-		this.geometry.setAttribute('position', new THREE.BufferAttribute( this.positions, 3 ) );
-		this.geometry.setAttribute('color', new THREE.BufferAttribute( this.colors, 3 ) );
+		this.geometry.setAttribute('position', new THREE.BufferAttribute( this.positions, 3 ) ); // задать координаты точек
+		this.geometry.setAttribute('color', new THREE.BufferAttribute( this.colors, 3 ) ); // задать цвет точек
 
-		this.mesh = new THREE.Points( this.geometry, this.material );
-		group.add( this.mesh );
+		this.mesh = new THREE.Points( this.geometry, this.material ); // создать объект с заданной геометрией и материалом
+		group.add( this.mesh ); // добавить на сцену в группу
 	};
 
+	/**
+	 * Функция возвращает распаршенную информацию из файла
+	 * @param {string} type Расширение файла
+	 * @param {string} input Содержимое файла
+	 */
 	static parse( type, input ) {
 		const res = {
 			'positions': [],
@@ -76,17 +78,22 @@ export default class Cloud
 		return res;
 	}
 
+	/**
+	 * Парсит TXT-файл
+	 * @param {string} fileText Содержимое файла
+	 * @param {object} res Объект в который будет записан результат
+	 */
 	static parseTXT( fileText, res = { 'positions': [], 'colors': [] } ) {
 		if( fileText ) {
-			const rows = fileText.split( '\n' );
+			const rows = fileText.split( '\n' ); // разбить текст на строки
 			console.log( 'ROWS FROM FILE', rows );
 
 			for( const row of rows ) {
-				const numbers = row.split( ' ' );
+				const numbers = row.split( ' ' ); // разбить строку на числа
 				if( numbers.length === 6 ) {
-					for( let i = 0; i < 3; i++ )
+					for( let i = 0; i < 3; i++ ) // первые 3 числа записать как координаты
 						res.positions.push( parseFloat( numbers[i] ) );
-					for( let i = 3; i < 6; i++ )
+					for( let i = 3; i < 6; i++ ) // вторые 3 числа записать как цвет
 						res.colors.push( parseFloat( numbers[i] ) );
 				}
 			}
@@ -98,39 +105,47 @@ export default class Cloud
 }
 
 Cloud.prototype.TXT = 32767;
-Cloud.prototype.ARRAY = 32766;
+Cloud.prototype.PLY = 32766;
 
 
 
 
-
+/**
+ * Прочитать данные из файла и распарсить их, тем самым подготовив к созданию облака
+ * @param {event} e Событие нажатия на кнопку
+ */
 function fileInput( e ) {
+	// Получить файл
 	const file = e.target.files[0];
-	if( file === undefined ) {
+	if( file === undefined ) { // проверить, что файл был выбран
 		console.log( 'Error: No file!' );
 		return;
 	}
 	console.log( file.name.match( /.+\.(\w+)$/ )[1].toUpperCase() );
 	const reader = new FileReader();
 
-	reader.readAsText( file );
+	reader.readAsText( file ); // получить содержимое файла
 	reader.onload = () => {
-		const fNum = parseInt( e.target.id.slice( -1 ) ); // расширение файла
+		const fNum = parseInt( e.target.id.slice( -1 ) );
 		if( !( fNum > 0 && fNum <= 2 ) )
 			return;
 		if( clouds[fNum] === undefined ) {
+			// Распарсить файл, передав его расширение и содержимое
 			const res = Cloud.parse(
 				Cloud.prototype[file.name.match( /.+\.(\w+)$/ )[1].toUpperCase()],
 				reader.result
 			);
-			if( res === undefined )
+			if( res === undefined ) // если не получилось прочесть содержимое, от выйти
 				return;
 			disableBtn( DOMInput[ 'file' + fNum ] );
 			enableBtn( DOMInput.update );
 
 
+			// Повесить выполнение функции на событие нажатия по кнопке Render
 			DOMInput.update.addEventListener( 'click', ( e ) => {
+				// Создать облако точек
 				clouds[fNum - 1] = new Cloud( res.positions, res.colors );
+				// Активировать/деактивировать очередные кнопки
 				if( clouds[0] !== undefined && clouds[1] !== undefined )
 					enableBtn( DOMInput.compare );
 				else
