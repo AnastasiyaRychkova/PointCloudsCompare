@@ -1,5 +1,5 @@
+DOMInput.file0.addEventListener( 'change', fileInput );
 DOMInput.file1.addEventListener( 'change', fileInput );
-DOMInput.file2.addEventListener( 'change', fileInput );
 
 // Вершинный шейдер
 let vertexShader = `
@@ -127,30 +127,31 @@ function fileInput( e ) {
 	reader.readAsText( file ); // получить содержимое файла
 	reader.onload = () => {
 		const fNum = parseInt( e.target.id.slice( -1 ) );
-		if( !( fNum > 0 && fNum <= 2 ) )
+		if( !( fNum >= 0 && fNum < 2 ) )
 			return;
-		if( clouds[fNum] === undefined ) {
+		if( clouds[ fNum ] === undefined ) {
 			// Распарсить файл, передав его расширение и содержимое
 			const res = Cloud.parse(
-				Cloud.prototype[file.name.match( /.+\.(\w+)$/ )[1].toUpperCase()],
+				Cloud.prototype[ file.name.match( /.+\.(\w+)$/ )[1].toUpperCase() ],
 				reader.result
 			);
-			if( res === undefined ) // если не получилось прочесть содержимое, от выйти
+			if( res === undefined ) // если не получилось прочесть содержимое, то выйти
 				return;
+			console.log( 'file' + fNum );
 			disableBtn( DOMInput[ 'file' + fNum ] );
-			enableBtn( DOMInput.update );
+			enableBtn( DOMInput[ 'update' + fNum ] );
 
 
 			// Повесить выполнение функции на событие нажатия по кнопке Render
-			DOMInput.update.addEventListener( 'click', ( e ) => {
+			DOMInput[ 'update' + fNum ].addEventListener( 'click', ( e ) => {
 				// Создать облако точек
-				clouds[fNum - 1] = new Cloud( res.positions, res.colors );
+				clouds[ fNum ] = new Cloud( res.positions, res.colors );
 				// Активировать/деактивировать очередные кнопки
 				if( clouds[0] !== undefined && clouds[1] !== undefined )
 					enableBtn( DOMInput.compare );
 				else
-					enableBtn( DOMInput.file2 );
-				disableBtn( DOMInput.update );
+					enableBtn( DOMInput.file1 );
+				disableBtn( DOMInput[ 'update' + fNum ] );
 			}, {'once': true} );
 			
 		}

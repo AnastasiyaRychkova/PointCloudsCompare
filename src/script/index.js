@@ -1,9 +1,11 @@
 const DOMInput = {
 	'init': document.getElementById( 'init' ),
-	'update': document.getElementById( 'update' ),
+	'update0': document.getElementById( 'update0' ),
+	'update1': document.getElementById( 'update1' ),
 	'compare': document.getElementById( 'compare' ),
+	'file0': document.getElementById( 'file0' ),
 	'file1': document.getElementById( 'file1' ),
-	'file2': document.getElementById( 'file2' )
+	'range': document.getElementById( 'range' )
 }
 
 // Деактивировать кнопку

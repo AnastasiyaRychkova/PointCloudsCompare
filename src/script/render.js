@@ -37,7 +37,7 @@ function init() {
 
 	animate(); // запустить анимацию
 	disableBtn( DOMInput.init ); // деактивировать кнопку Init
-	enableBtn( DOMInput.file1 ); // активировать выбор первого файла
+	enableBtn( DOMInput.file0 ); // активировать выбор первого файла
 }
 
 
