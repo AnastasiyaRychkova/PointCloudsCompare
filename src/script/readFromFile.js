@@ -26,7 +26,7 @@ precision highp float;
 varying vec3 v_color;
 
 void main(){
-	gl_FragColor = vec4( v_color, 255 );
+	gl_FragColor = vec4( v_color, 1.0 );
 }
 
 `;
@@ -65,7 +65,6 @@ class Cloud
 			'colors': []
 		};
 
-		console.log( type, Cloud.prototype.TXT );
 		switch( type ) {
 			case Cloud.prototype.TXT:
 				Cloud.parseTXT( input, res );
@@ -121,7 +120,7 @@ function fileInput( e ) {
 		console.log( 'Error: No file!' );
 		return;
 	}
-	console.log( file.name.match( /.+\.(\w+)$/ )[1].toUpperCase() );
+
 	const reader = new FileReader();
 
 	reader.readAsText( file ); // получить содержимое файла
@@ -137,7 +136,6 @@ function fileInput( e ) {
 			);
 			if( res === undefined ) // если не получилось прочесть содержимое, то выйти
 				return;
-			console.log( 'file' + fNum );
 			disableBtn( DOMInput[ 'file' + fNum ] );
 			enableBtn( DOMInput[ 'update' + fNum ] );
 

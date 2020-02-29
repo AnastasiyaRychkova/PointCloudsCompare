@@ -5,7 +5,8 @@ const DOMInput = {
 	'compare': document.getElementById( 'compare' ),
 	'file0': document.getElementById( 'file0' ),
 	'file1': document.getElementById( 'file1' ),
-	'range': document.getElementById( 'range' )
+	'range': document.getElementById( 'range' ),
+	'rangeLabel': document.getElementById( 'rs-label' )
 }
 
 // Деактивировать кнопку
