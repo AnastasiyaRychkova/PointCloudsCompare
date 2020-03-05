@@ -40,7 +40,7 @@ class Lines {
 
 		let minD = 0; // минимальное найденное расстояние между точками
 		let maxD = 0; // максимальное  найденное расстояние между точками
-		
+
 		{
 			const dx1 = cloud1.positions[ 0 ] - cloud2.positions[ 0 ];
 			const dy1 = cloud1.positions[ 1 ] - cloud2.positions[ 1 ];
@@ -140,7 +140,10 @@ class Lines {
 		}
 
 		// Создать промежуточное облако и поместить на сцену
-		clouds.push( new Cloud( resCloudPos, resCloudCol ) );
+		clouds.push( new Cloud( getGeometryFromArray( {
+			'position': resCloudPos,
+			'color': resCloudCol
+		} ) ) );
 	}
 }
 

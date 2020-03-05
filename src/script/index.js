@@ -2,6 +2,8 @@ const DOMInput = {
 	'init': document.getElementById( 'init' ),
 	'update0': document.getElementById( 'update0' ),
 	'update1': document.getElementById( 'update1' ),
+	'centerOfMass0': document.getElementById( 'com0' ),
+	'centerOfMass1': document.getElementById( 'com1' ),
 	'compare': document.getElementById( 'compare' ),
 	'file0': document.getElementById( 'file0' ),
 	'file1': document.getElementById( 'file1' ),

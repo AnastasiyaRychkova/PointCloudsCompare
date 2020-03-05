@@ -12,7 +12,10 @@ function init() {
 	// Создание canvas
 	container = document.getElementById('canvas');
 	canvasWidth = container.clientWidth;
-	canvasHeight = container.clientHeight
+	canvasHeight = container.clientHeight;
+	const menuWidth = window.innerWidth - canvasWidth;
+	const menuHeight = window.innerHeight - canvasHeight;
+
 	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.setSize( canvasWidth, canvasHeight ); // установить размеры canvas
 	container.appendChild( renderer.domElement ); // добавить canvas на страницу
@@ -20,6 +23,16 @@ function init() {
 	// Камера
 	camera = new THREE.PerspectiveCamera(35, canvasWidth / canvasHeight, 1, 1000);
 	camera.position.z = 30;
+
+	window.addEventListener( 'resize', onWindowResize, false );
+
+	function onWindowResize() {
+		canvasWidth = window.innerWidth - menuWidth;
+		canvasHeight = window.innerHeight - menuHeight;
+		camera.aspect = canvasWidth / canvasHeight; // изменение пропорций камеры
+		camera.updateProjectionMatrix();
+		renderer.setSize( canvasWidth, canvasHeight );
+	}
 
 	// Объект, выполняющий работу по перемещению камеры (вращение, приближение, отдаление)
 	// Можно вращать мышкой и перемещать стрелками
@@ -38,6 +51,7 @@ function init() {
 	animate(); // запустить анимацию
 	disableBtn( DOMInput.init ); // деактивировать кнопку Init
 	enableBtn( DOMInput.file0 ); // активировать выбор первого файла
+	enableBtn( DOMInput.file1 ); // активировать выбор второго файла
 }
 
 
@@ -48,3 +62,33 @@ function animate() {
 }
 
 DOMInput.init.addEventListener( 'click', init ); // повесить выполнение функции init() на событие клика
+
+
+
+function getGeometryFromArray( attr ) {
+	if( attr.position === undefined )
+		return undefined;
+
+	const geometry = new THREE.BufferGeometry();
+
+	geometry.setAttribute(
+		'position',
+		new THREE.BufferAttribute(
+			attr.position instanceof Float32Array ? attr.position
+													: new Float32Array( attr.position ),
+			3
+		)
+	); // задать координаты точек ( geometry.attributes.position.array )
+
+	if( attr.color !== undefined)
+		geometry.setAttribute(
+			'color',
+			new THREE.BufferAttribute(
+				attr.color instanceof Float32Array ? attr.color
+													: new Float32Array( attr.color ),
+				3
+			)
+		); // задать цвет точек
+
+	return geometry;
+}

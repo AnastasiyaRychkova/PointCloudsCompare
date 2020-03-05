@@ -3,13 +3,10 @@ body {
 	display: flex;
 	position: fixed;
 	align-items: center;
-	justify-content: center;
 	margin: 0;
 	width: 100vw;
 	height: 100vh;
 	padding: 0;
-	border: 5px solid #e7e7e7;
-	color: #949494;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 14px;
 }
@@ -17,14 +14,22 @@ body {
 form {
 	display: flex;
 	flex-direction: column;
-	margin-left: 16px;
+	align-items: center;
+	margin: 8px;
+	padding: 16px 8px;
+	border: 2px solid #e7e7e7;
+	border-radius: 15px;
 }
 
 #canvas {
-	margin-bottom: 10px;
-	width: 500px;
-	height: 500px;
+	flex: 1 1 500px;
 	border: 5px solid #e7e7e7;
+	align-self: stretch;
+}
+
+#canvas:active,
+#canvas:focus {
+	outline: none;
 }
 
 button {
@@ -47,13 +52,26 @@ button[disabled] {
 	color: #e7e7e7;
 }
 
+.cloud {
+	display: flex;
+	flex-direction: column;
+	border: 2px solid #e7e7e7;
+	border-radius: 15px;
+	margin: 10px 0;
+	overflow: hidden;
+}
+
+.com {
+	width: 70px;
+}
+
 input[type="file"] {
 	margin: 5px;
 	height: 30px;
 }
 
 label {
-	margin-top: 10px;
+	margin: 10px;
 	padding-left: 5px;
 	color: #949494;
 	font-family: Arial, Helvetica, sans-serif;
