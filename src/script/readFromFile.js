@@ -32,23 +32,22 @@ void main(){
 `;
 
 // Облако точек
-class Cloud
-{
+class Cloud {
 	constructor( pos, col ) {
 		this.positions = new Float32Array( pos ); // массив позиций точек
 		this.colors = new Float32Array( col ); // массив цветов точек
 
 		// Материал точек
-		this.material = new THREE.RawShaderMaterial({
+		this.material = new THREE.RawShaderMaterial( {
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader
-		});
+		} );
 
 		// Геометрия
 		this.geometry = new THREE.BufferGeometry();
 
-		this.geometry.setAttribute('position', new THREE.BufferAttribute( this.positions, 3 ) ); // задать координаты точек
-		this.geometry.setAttribute('color', new THREE.BufferAttribute( this.colors, 3 ) ); // задать цвет точек
+		this.geometry.setAttribute( 'position', new THREE.BufferAttribute( this.positions, 3 ) ); // задать координаты точек
+		this.geometry.setAttribute( 'color', new THREE.BufferAttribute( this.colors, 3 ) ); // задать цвет точек
 
 		this.mesh = new THREE.Points( this.geometry, this.material ); // создать объект с заданной геометрией и материалом
 		group.add( this.mesh ); // добавить на сцену в группу
@@ -65,11 +64,11 @@ class Cloud
 			'colors': []
 		};
 
-		switch( type ) {
+		switch ( type ) {
 			case Cloud.prototype.TXT:
 				Cloud.parseTXT( input, res );
 				break;
-		
+
 			default:
 				console.log( 'Error: Unknown text file type' );
 				break;
@@ -82,7 +81,10 @@ class Cloud
 	 * @param {string} fileText Содержимое файла
 	 * @param {object} res Объект в который будет записан результат
 	 */
-	static parseTXT( fileText, res = { 'positions': [], 'colors': [] } ) {
+	static parseTXT( fileText, res = {
+		'positions': [],
+		'colors': []
+	} ) {
 		if( fileText ) {
 			const rows = fileText.split( '\n' ); // разбить текст на строки
 			console.log( 'ROWS FROM FILE', rows );
@@ -91,13 +93,12 @@ class Cloud
 				const numbers = row.split( ' ' ); // разбить строку на числа
 				if( numbers.length === 6 ) {
 					for( let i = 0; i < 3; i++ ) // первые 3 числа записать как координаты
-						res.positions.push( parseFloat( numbers[i] ) );
+						res.positions.push( parseFloat( numbers[ i ] ) );
 					for( let i = 3; i < 6; i++ ) // вторые 3 числа записать как цвет
-						res.colors.push( parseFloat( numbers[i] ) );
+						res.colors.push( parseFloat( numbers[ i ] ) );
 				}
 			}
-		}
-		else
+		} else
 			console.log( 'Error' );
 		return res;
 	}
@@ -115,7 +116,7 @@ Cloud.prototype.PLY = 32766;
  */
 function fileInput( e ) {
 	// Получить файл
-	const file = e.target.files[0];
+	const file = e.target.files[ 0 ];
 	if( file === undefined ) { // проверить, что файл был выбран
 		console.log( 'Error: No file!' );
 		return;
@@ -131,7 +132,7 @@ function fileInput( e ) {
 		if( clouds[ fNum ] === undefined ) {
 			// Распарсить файл, передав его расширение и содержимое
 			const res = Cloud.parse(
-				Cloud.prototype[ file.name.match( /.+\.(\w+)$/ )[1].toUpperCase() ],
+				Cloud.prototype[ file.name.match( /.+\.(\w+)$/ )[ 1 ].toUpperCase() ],
 				reader.result
 			);
 			if( res === undefined ) // если не получилось прочесть содержимое, то выйти
@@ -145,19 +146,19 @@ function fileInput( e ) {
 				// Создать облако точек
 				clouds[ fNum ] = new Cloud( res.positions, res.colors );
 				// Активировать/деактивировать очередные кнопки
-				if( clouds[0] !== undefined && clouds[1] !== undefined )
+				if( clouds[ 0 ] !== undefined && clouds[ 1 ] !== undefined )
 					enableBtn( DOMInput.compare );
 				else
 					enableBtn( DOMInput.file1 );
 				disableBtn( DOMInput[ 'update' + fNum ] );
-			}, {'once': true} );
-			
-		}
-		else
+			}, {
+				'once': true
+			} );
+
+		} else
 			console.log( 'Error: Trying to reload first cloud' );
 	}
 	reader.onerror = ( error ) => {
 		console.error( error );
 	}
-	
 }
