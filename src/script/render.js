@@ -50,8 +50,8 @@ function init() {
 
 	animate(); // запустить анимацию
 	disableBtn( DOMInput.init ); // деактивировать кнопку Init
-	enableBtn( DOMInput.file0 ); // активировать выбор первого файла
-	enableBtn( DOMInput.file1 ); // активировать выбор второго файла
+	enableBtn( DOMInput.clouds[ 0 ].file ); // активировать выбор первого файла
+	enableBtn( DOMInput.clouds[ 1 ].file ); // активировать выбор второго файла
 }
 
 
@@ -92,3 +92,28 @@ function getGeometryFromArray( attr ) {
 
 	return geometry;
 }
+
+
+
+
+class CloudComponent {
+	constructor() {
+		this.parent 	= group;
+		this.positions 	= undefined;
+		this.geometry 	= undefined;
+		this.material 	= undefined;
+		this.mesh 		= undefined;
+	}
+
+	delete() {
+		this.parent.remove( this.mesh );
+		this.geometry.dispose();
+		this.material.dispose();
+		this.positions = undefined;
+		this.geometry  = undefined;
+		this.material  = undefined;
+		this.mesh 	   = undefined;
+	}
+}
+
+let linesRef = undefined; // линии
