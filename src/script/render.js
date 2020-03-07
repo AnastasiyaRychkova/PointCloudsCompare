@@ -5,6 +5,7 @@ let container;
 let camera;
 let scene;
 let group;
+let axesHelper;
 let controls;
 
 
@@ -32,14 +33,20 @@ function init() {
 		camera.aspect = canvasWidth / canvasHeight; // изменение пропорций камеры
 		camera.updateProjectionMatrix();
 		renderer.setSize( canvasWidth, canvasHeight );
+		render();
 	}
 
 	// Объект, выполняющий работу по перемещению камеры (вращение, приближение, отдаление)
 	// Можно вращать мышкой и перемещать стрелками
 	controls = new OrbitControls( camera, container );
 
+	controls.addEventListener( 'change', render );
+
 	// Сцена
 	scene = new THREE.Scene();
+
+	axesHelper = new THREE.AxesHelper( 5 );
+	scene.add( axesHelper );
 
 	// Цвет фона
 	scene.background = new THREE.Color( 0xe7e7e7 );
@@ -47,17 +54,22 @@ function init() {
 	// Группировка объектов
 	group = new THREE.Group();
 	scene.add( group ); // добавить группу на сцену
+	render();
 
-	animate(); // запустить анимацию
+//	animate(); // запустить анимацию
 	disableBtn( DOMInput.init ); // деактивировать кнопку Init
 	enableBtn( DOMInput.clouds[ 0 ].file ); // активировать выбор первого файла
 	enableBtn( DOMInput.clouds[ 1 ].file ); // активировать выбор второго файла
 }
 
+function render() {
+	renderer.render(scene, camera); // отрендерить картинку
+}
+
 
 function animate() {
 	group.rotation.y += 0.001; // повернуть группу вокруг оси y
-	renderer.render(scene, camera); // отрендерить картинку
+	render();
 	requestAnimationFrame(animate); // запланировать рендер следующего кадра
 }
 

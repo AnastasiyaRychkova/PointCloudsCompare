@@ -4,14 +4,16 @@ DOMInput.clouds[ 1 ].file.addEventListener( 'change', fileInput );
 
 // Облако точек
 class Cloud extends CloudComponent {
-	constructor( geometry, cParent = undefined, pSize = 6.0 ) {
+	constructor( geometry, cParent = undefined, pSize = 4.0 ) {
 		super();
+		console.log( geometry );
 		this.positions = geometry.attributes.position.array; // массив позиций точек
-		this.colors = geometry.attributes.color.array; // массив цветов точек
+		this.colors = geometry.attributes.color ? geometry.attributes.color.array : undefined; // массив цветов точек
 
 		// Материал точек
 		this.material = new THREE.PointsMaterial( {
 			vertexColors: THREE.VertexColors,
+			color: 0xeaeaea,
 			size: pSize,
 			sizeAttenuation: false
 		} );
@@ -27,12 +29,10 @@ class Cloud extends CloudComponent {
 		this.parent.add( this.mesh ); // добавить на сцену в группу
 
 		this.center = undefined;
+		render();
 	};
 
-	static showCenterOfMass( cloud, pSize = 12.0, pColor = [ 0.5, 0.5, 0.5 ] ) {
-		if( !cloud instanceof Cloud )
-			return;
-
+	showCenterOfMass( pSize = 12.0, pColor = [ 0.5, 0.5, 0.5 ] ) {
 		const centerOfMass = [ 3 ];
 
 		let xSum = 0;
@@ -40,22 +40,28 @@ class Cloud extends CloudComponent {
 		let zSum = 0;
 
 		let i = 0;
-		while( i < cloud.positions.length ) {
-			xSum += cloud.positions[ i++ ];
-			ySum += cloud.positions[ i++ ];
-			zSum += cloud.positions[ i++ ];
+		while( i < this.positions.length ) {
+			xSum += this.positions[ i++ ];
+			ySum += this.positions[ i++ ];
+			zSum += this.positions[ i++ ];
 		}
 
-		centerOfMass[ 0 ] = xSum / cloud.positions.length;
-		centerOfMass[ 1 ] = ySum / cloud.positions.length;
-		centerOfMass[ 2 ] = zSum / cloud.positions.length;
+		console.log( xSum, this.positions.length );
+		console.log( ySum, this.positions.length );
+		console.log( zSum, this.positions.length );
 
-		cloud.center = new Cloud(
+		const n = this.positions.length / 3;
+
+		centerOfMass[ 0 ] = xSum / n;
+		centerOfMass[ 1 ] = ySum / n;
+		centerOfMass[ 2 ] = zSum / n;
+
+		this.center = new Cloud(
 			getGeometryFromArray( {
 				'position': centerOfMass,
 				'color': pColor
 			} ),
-			cloud.parent,
+			this.parent,
 			pSize
 		);
 	}
@@ -110,15 +116,36 @@ class Cloud extends CloudComponent {
 			for( const row of rows ) {
 				const numbers = row.split( ' ' ); // разбить строку на числа
 				if( numbers.length === 6 ) {
-					for( let i = 0; i < 3; i++ ) // первые 3 числа записать как координаты
-						res.positions.push( parseFloat( numbers[ i ] ) );
-					for( let i = 3; i < 6; i++ ) // вторые 3 числа записать как цвет
-						res.colors.push( parseFloat( numbers[ i ] ) );
+					for( let i = 0; i < 3; i++ ) { // первые 3 числа записать как координаты
+						const n = parseFloat( numbers[ i ] );
+						if( n === NaN )
+							n = 0.0;
+						res.positions.push( n );
+					}
+					for( let i = 3; i < 6; i++ ) { // вторые 3 числа записать как цвет
+						const c = parseFloat( numbers[ i ] );
+						if( c === NaN )
+							c = 0.0;
+						else if( c < 0 )
+							c = 0.0;
+						else if( c > 1 )
+							c = 1.0;
+						res.colors.push( c );
+					}
 				}
 			}
-		} else
+		} else {
 			console.log( 'Error' );
-		return res;
+			return undefined;
+		}
+
+		if( res.positions.length === 0 )
+			return undefined;
+
+		return getGeometryFromArray( {
+			'position': res.positions,
+			'color': res.colors
+		} );
 	}
 
 
@@ -144,64 +171,100 @@ function fileInput( e ) {
 		return;
 	}
 
-	const reader = new FileReader();
+	const fNum = parseInt( e.target.id.slice( -1 ) );
+	if( !( fNum >= 0 && fNum < 2 ) )
+		return;
 
-	reader.readAsText( file ); // получить содержимое файла
-	reader.onload = () => {
-		const fNum = parseInt( e.target.id.slice( -1 ) );
-		if( !( fNum >= 0 && fNum < 2 ) )
+	enableBtn( DOMInput.clouds[ fNum ].update );
+	disableBtn( DOMInput.clouds[ fNum ].centerOfMass );
+
+
+
+	// Повесить выполнение функции на событие нажатия по кнопке Render
+	DOMInput.clouds[ fNum ].update.addEventListener( 'click', async ( e ) => {
+		const type = file.name.match( /.+\.(\w+)$/ )[ 1 ].toLowerCase();
+		console.log( type );
+		let fileText;
+		let geometry;
+
+		const readAsTextPromise = ( inputFile ) => {
+			const reader = new FileReader();
+
+			return new Promise( ( resolve, reject ) => {
+				reader.onerror = () => {
+					reader.abort();
+					reject( new DOMException( "Problem reading input file." ) );
+				};
+
+				reader.onload = () => {
+					resolve( reader.result );
+				};
+				reader.readAsText( inputFile );
+			} );
+		};
+
+		try {
+			fileText = await readAsTextPromise( file );
+		} catch ( error ) {
+			console.error( error );
+			return;
+		}
+
+		switch ( type ) {
+			case 'txt':
+				geometry = Cloud.parseTXT( fileText );
+				break;
+			case 'ply':
+				const loader = new THREE.PLYLoader();
+				loader.setPropertyNameMapping( {
+					diffuse_red: 'red',
+					diffuse_green: 'green',
+					diffuse_blue: 'blue'
+				} );
+				geometry = loader.parse( fileText );
+				break;
+			default:
+				console.error( new DOMException( "Problem reading input file." ) );
+				return;
+		}
+
+		if( geometry === undefined ) // если не получилось прочесть содержимое, то выйти
 			return;
 
-		enableBtn( DOMInput.clouds[ fNum ].update );
-		disableBtn( DOMInput.clouds[ fNum ].centerOfMass );
-
-
-
-		// Повесить выполнение функции на событие нажатия по кнопке Render
-		DOMInput.clouds[ fNum ].update.addEventListener( 'click', ( e ) => {
-			disableBtn( DOMInput.compare );
-			if( Cloud.inst[ fNum ] !== undefined ) {
-				if( Cloud.inst[ 2 ] !== undefined ) {
-					Cloud.inst[ 2 ].delete(); // удаление промежуточных точек
-					linesRef.delete(); // удаление соединительных линий
-				}
-				Cloud.inst[ fNum ].delete();
+		disableBtn( DOMInput.compare );
+		if( Cloud.inst[ fNum ] !== undefined ) {
+			if( Cloud.inst[ 2 ] !== undefined ) {
+				Cloud.inst[ 2 ].delete(); // удаление промежуточных точек
+				linesRef.delete(); // удаление соединительных линий
 			}
+			Cloud.inst[ fNum ].delete();
+		}
+
+		const cloudGroup = new THREE.Group();
+		group.add( cloudGroup );
+		// Создать облако точек
+		Cloud.inst[ fNum ] = new Cloud( geometry, cloudGroup );
+		// Активировать/деактивировать очередные кнопки
+		if( Cloud.inst[ 0 ] !== undefined && Cloud.inst[ 1 ] !== undefined )
+			enableBtn( DOMInput.compare );
+		disableBtn( DOMInput.clouds[ fNum ].update );
+		enableBtn( DOMInput.clouds[ fNum ].centerOfMass );
 
 
 
-			// Распарсить файл, передав его расширение и содержимое
-			const res = Cloud.parse(
-				Cloud[ file.name.match( /.+\.(\w+)$/ )[ 1 ].toUpperCase() ],
-				reader.result
-			);
-			if( res === undefined ) // если не получилось прочесть содержимое, то выйти
-				return;
+		DOMInput.clouds[ fNum ].centerOfMass.addEventListener( 'click', ( e ) => {
+			const cloud = Cloud.inst[ fNum ]
+			if( cloud !== undefined )
+				cloud.showCenterOfMass( 8 );
+			controls.target = new THREE.Vector3(
+				cloud.center.positions[0],
+				cloud.center.positions[1],
+				cloud.center.positions[2] );
+			controls.update();
+			render();
+		} )
 
-			const cloudGroup = new THREE.Group();
-			group.add( cloudGroup );
-			// Создать облако точек
-			Cloud.inst[ fNum ] = new Cloud( res, cloudGroup );
-			// Активировать/деактивировать очередные кнопки
-			if( Cloud.inst[ 0 ] !== undefined && Cloud.inst[ 1 ] !== undefined )
-				enableBtn( DOMInput.compare );
-			disableBtn( DOMInput.clouds[ fNum ].update );
-			enableBtn( DOMInput.clouds[ fNum ].centerOfMass );
-
-
-
-			DOMInput.clouds[ fNum ].centerOfMass.addEventListener( 'click', ( e ) => {
-				Cloud.showCenterOfMass( Cloud.inst[ fNum ], 8 );
-				disableBtn( DOMInput.clouds[ fNum ].centerOfMass );
-			}, {
-				'once': true
-			} )
-
-		}, {
-			'once': true
-		} );
-	}
-	reader.onerror = ( error ) => {
-		console.error( error );
-	}
+	}, {
+		'once': true
+	} );
 }

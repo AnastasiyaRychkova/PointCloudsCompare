@@ -4,8 +4,8 @@ class Lines extends CloudComponent {
 	constructor( cloud1, cloud2 ) {
 		super();
 		// Сделать cloud1 облаком с наибольшим количеством точек
-		if( cloud1.positions.length < cloud2.positions.length )
-			[ cloud1, cloud2 ] = [ cloud2, cloud1 ]; // swap
+		/* if( cloud1.positions.length < cloud2.positions.length )
+			[ cloud1, cloud2 ] = [ cloud2, cloud1 ]; // swap */
 		const pointCount = Math.floor( cloud1.positions.length / 3 );
 		this.positions = new Float32Array( pointCount * 3 * 2 ); // массив вершин
 		this.colors = new Float32Array( pointCount * 3 * 2 ); // массив цветов вершин
@@ -14,7 +14,6 @@ class Lines extends CloudComponent {
 		this.maxD = 0; // максимальное найденное расстояние между точками
 		this.segmentLen = []; // длинны сегментов
 		this.pointInterpolation = parseInt( DOMInput.range.value ); // количество промежуточных точек
-
 		// Сравнить два облака, заполнив массив вершин и цветов
 		this.compare( cloud1, cloud2 );
 
@@ -33,6 +32,7 @@ class Lines extends CloudComponent {
 		// Создание объекта
 		this.mesh = new THREE.LineSegments( this.geometry, this.material );
 		this.parent.add( this.mesh ); // добавление объекта на сцену
+		render();
 	};
 
 	delete() {
