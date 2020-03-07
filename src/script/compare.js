@@ -1,7 +1,9 @@
 // Линии
-class Lines extends CloudComponent {
+class Lines extends CloudComponent
+{
 	// Проводит линии между двумя облаками
-	constructor( cloud1, cloud2 ) {
+	constructor( cloud1, cloud2 )
+	{
 		super();
 		// Сделать cloud1 облаком с наибольшим количеством точек
 		/* if( cloud1.positions.length < cloud2.positions.length )
@@ -18,13 +20,15 @@ class Lines extends CloudComponent {
 		this.compare( cloud1, cloud2 );
 
 		// Материал линий
-		this.material = new THREE.LineBasicMaterial( {
+		this.material = new THREE.LineBasicMaterial(
+		{
 			vertexColors: THREE.VertexColors
 		} );
 
 		// Геометрия
 		// Линии проводятся между каждой парой вершин, заданных в массиве position
-		this.geometry = getGeometryFromArray( {
+		this.geometry = getGeometryFromArray(
+		{
 			'position': this.positions,
 			'color': this.colors
 		} );
@@ -35,14 +39,16 @@ class Lines extends CloudComponent {
 		render();
 	};
 
-	delete() {
+	delete()
+	{
 		super.delete();
 		linesRef = undefined;
 	}
 
 
 	/** Получить координаты сегментов линий, соединяя каждую точку из облака cloud1 с ближайшей точкой из облака cloud2 */
-	compare( cloud1, cloud2 ) {
+	compare( cloud1, cloud2 )
+	{
 		const pointsN = Math.floor( cloud1.positions.length / 3 ); // количество точек в первом облаке
 		const pointsN2 = Math.floor( cloud2.positions.length / 3 ); // количество точек в первом облаке
 
@@ -70,7 +76,8 @@ class Lines extends CloudComponent {
 		const colorLen = ( this.maxD - this.minD ) / 3; // длина сегмента отвечающая за 1 цвет
 
 		// Назначение цвета для сегментов и промежуточных точек
-		for( let i = 0; i < pointsN; i++ ) {
+		for( let i = 0; i < pointsN; i++ )
+		{
 
 			// Определение цвета для i-го сегмента с длиной this.segmentLen[ i ]
 			let segmentColor = colorLen ? Math.floor( ( this.segmentLen[ i ] - this.minD ) / colorLen ) : 0;
@@ -86,7 +93,8 @@ class Lines extends CloudComponent {
 			this.colors[ colorPos++ ] = Lines.heatmapColor[ segmentColor ][ 2 ];
 
 			// Сохранение цвета промежуточных точек
-			for( let pointIndex = 1; pointIndex <= this.pointInterpolation; pointIndex++ ) {
+			for( let pointIndex = 1; pointIndex <= this.pointInterpolation; pointIndex++ )
+			{
 				resCloudCol.push(
 					Lines.heatmapColor[ segmentColor ][ 0 ],
 					Lines.heatmapColor[ segmentColor ][ 1 ],
@@ -96,20 +104,23 @@ class Lines extends CloudComponent {
 		}
 
 		// Создать промежуточное облако и поместить на сцену
-		Cloud.inst[2] = new Cloud( getGeometryFromArray( {
+		Cloud.inst[ 2 ] = new Cloud( getGeometryFromArray(
+		{
 			'position': resCloudPos,
 			'color': resCloudCol
 		} ) );
 
 	}
 
-	vertexPositionCalculation( cloud1, cloud2, resCloudPos ) {
+	vertexPositionCalculation( cloud1, cloud2, resCloudPos )
+	{
 		const pointsN = Math.floor( cloud1.positions.length / 3 ); // количество точек в первом облаке
 		const pointsN2 = Math.floor( cloud2.positions.length / 3 ); // количество точек в первом облаке
 		let vertexPos = 0;
 
 		// заполнение массива this.positions координатами вершин сегментов
-		for( let i = 0; i < pointsN; i++ ) {
+		for( let i = 0; i < pointsN; i++ )
+		{
 
 			const dx1 = cloud1.positions[ i * 3 ] - cloud2.positions[ 0 ];
 			const dy1 = cloud1.positions[ i * 3 + 1 ] - cloud2.positions[ 1 ];
@@ -120,14 +131,16 @@ class Lines extends CloudComponent {
 			let minPoint = 0; // Индекс ближайшей точки
 
 			// Нахождение ближайшей точки
-			for( let j = 1; j < pointsN2; j++ ) {
+			for( let j = 1; j < pointsN2; j++ )
+			{
 				const dx = cloud1.positions[ i * 3 ] - cloud2.positions[ j * 3 ];
 				const dy = cloud1.positions[ i * 3 + 1 ] - cloud2.positions[ j * 3 + 1 ];
 				const dz = cloud1.positions[ i * 3 + 2 ] - cloud2.positions[ j * 3 + 2 ];
 				// Нахождение расстояния по т. Пифогора
 				const dist = Math.sqrt( dx * dx + dy * dy + dz * dz );
 
-				if( dist < minDist ) {
+				if( dist < minDist )
+				{
 					minDist = dist;
 					minPoint = j;
 				}
@@ -153,7 +166,8 @@ class Lines extends CloudComponent {
 			где this.pointInterpolation – заданное пользователем количество
 			X1(i) - ( X1(i) - X2(i)) / ( n - 1 ) * i, i∈[1,n]
 			*/
-			for( let pointIndex = 1; pointIndex <= this.pointInterpolation; pointIndex++ ) {
+			for( let pointIndex = 1; pointIndex <= this.pointInterpolation; pointIndex++ )
+			{
 				resCloudPos.push(
 					cloud1.positions[ i * 3 ] - ( cloud1.positions[ i * 3 ] - cloud2.positions[ minPoint * 3 ] ) / ( this.pointInterpolation + 1 ) * pointIndex,
 					cloud1.positions[ i * 3 + 1 ] - ( cloud1.positions[ i * 3 + 1 ] - cloud2.positions[ minPoint * 3 + 1 ] ) / ( this.pointInterpolation + 1 ) * pointIndex,
@@ -164,22 +178,25 @@ class Lines extends CloudComponent {
 	}
 
 
-	divide() {
-		if( Cloud.inst[2] !== undefined )
-			Cloud.inst[2].delete();
+	divide()
+	{
+		if( Cloud.inst[ 2 ] !== undefined )
+			Cloud.inst[ 2 ].delete();
 		const pos = [];
 		const col = [];
 		const n = Math.floor( this.positions.length / 6 ); // количество сегментов
 
-		for (let i = 0; i < n; i++) {
+		for( let i = 0; i < n; i++ )
+		{
 			const i0 = i * 6;
 			const color = {
 				'r': this.colors[ i0 ],
 				'g': this.colors[ i0 + 1 ],
 				'b': this.colors[ i0 + 2 ]
 			};
-			
-			for( let pointIndex = 1; pointIndex <= this.pointInterpolation; pointIndex++ ) {
+
+			for( let pointIndex = 1; pointIndex <= this.pointInterpolation; pointIndex++ )
+			{
 				/* Запись координат промежуточных точек */
 				pos.push(
 					this.positions[ i0 ] - ( this.positions[ i0 ] - this.positions[ i0 + 3 ] ) / ( this.pointInterpolation + 1 ) * pointIndex,
@@ -192,11 +209,12 @@ class Lines extends CloudComponent {
 					color.b
 				);
 			}
-			
+
 		}
 
 		// Создать промежуточное облако и поместить на сцену
-		Cloud.inst[2] = new Cloud( getGeometryFromArray( {
+		Cloud.inst[ 2 ] = new Cloud( getGeometryFromArray(
+		{
 			'position': pos,
 			'color': col
 		} ) );
@@ -207,13 +225,15 @@ class Lines extends CloudComponent {
 LinesRef = Lines;
 
 // Повесить выполнение функции на событие нажатия по кнопке Compare
-DOMInput.compare.addEventListener( 'click', ( e ) => {
-	if( linesRef === undefined ) {
-		linesRef = new Lines(Cloud.inst[ 0 ],Cloud.inst[ 1 ] );
+DOMInput.compare.addEventListener( 'click', ( e ) =>
+{
+	if( linesRef === undefined )
+	{
+		linesRef = new Lines( Cloud.inst[ 0 ], Cloud.inst[ 1 ] );
 		return;
 	}
 	linesRef.divide();
-});
+} );
 
 
 
@@ -225,7 +245,8 @@ Lines.heatmapColor = [ // Значения цветов для тепловой 
 
 
 // Изменение положения надписи у trackbar
-DOMInput.range.addEventListener( 'input', ( e ) => {
+DOMInput.range.addEventListener( 'input', ( e ) =>
+{
 	if( linesRef !== undefined )
 		linesRef.pointInterpolation = parseInt( e.target.value );
 	DOMInput.rangeLabel.textContent = e.target.value;

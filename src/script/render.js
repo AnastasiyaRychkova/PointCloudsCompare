@@ -1,4 +1,4 @@
-let canvasWidth  = 500;
+let canvasWidth = 500;
 let canvasHeight = 500;
 let renderer;
 let container;
@@ -9,25 +9,30 @@ let axesHelper;
 let controls;
 
 
-function init() {
+function init()
+{
 	// Создание canvas
-	container = document.getElementById('canvas');
+	container = document.getElementById( 'canvas' );
 	canvasWidth = container.clientWidth;
 	canvasHeight = container.clientHeight;
 	const menuWidth = window.innerWidth - canvasWidth;
 	const menuHeight = window.innerHeight - canvasHeight;
 
-	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer = new THREE.WebGLRenderer(
+	{
+		antialias: true
+	} );
 	renderer.setSize( canvasWidth, canvasHeight ); // установить размеры canvas
 	container.appendChild( renderer.domElement ); // добавить canvas на страницу
 
 	// Камера
-	camera = new THREE.PerspectiveCamera(35, canvasWidth / canvasHeight, 1, 1000);
+	camera = new THREE.PerspectiveCamera( 35, canvasWidth / canvasHeight, 1, 1000 );
 	camera.position.z = 30;
 
 	window.addEventListener( 'resize', onWindowResize, false );
 
-	function onWindowResize() {
+	function onWindowResize()
+	{
 		canvasWidth = window.innerWidth - menuWidth;
 		canvasHeight = window.innerHeight - menuHeight;
 		camera.aspect = canvasWidth / canvasHeight; // изменение пропорций камеры
@@ -56,28 +61,31 @@ function init() {
 	scene.add( group ); // добавить группу на сцену
 	render();
 
-//	animate(); // запустить анимацию
+	//	animate(); // запустить анимацию
 	disableBtn( DOMInput.init ); // деактивировать кнопку Init
 	enableBtn( DOMInput.clouds[ 0 ].file ); // активировать выбор первого файла
 	enableBtn( DOMInput.clouds[ 1 ].file ); // активировать выбор второго файла
 }
 
-function render() {
-	renderer.render(scene, camera); // отрендерить картинку
+function render()
+{
+	renderer.render( scene, camera ); // отрендерить картинку
 }
 
 
-function animate() {
+function animate()
+{
 	group.rotation.y += 0.001; // повернуть группу вокруг оси y
 	render();
-	requestAnimationFrame(animate); // запланировать рендер следующего кадра
+	requestAnimationFrame( animate ); // запланировать рендер следующего кадра
 }
 
 DOMInput.init.addEventListener( 'click', init ); // повесить выполнение функции init() на событие клика
 
 
 
-function getGeometryFromArray( attr ) {
+function getGeometryFromArray( attr )
+{
 	if( attr.position === undefined )
 		return undefined;
 
@@ -86,18 +94,18 @@ function getGeometryFromArray( attr ) {
 	geometry.setAttribute(
 		'position',
 		new THREE.BufferAttribute(
-			attr.position instanceof Float32Array ? attr.position
-													: new Float32Array( attr.position ),
+			attr.position instanceof Float32Array ? attr.position :
+			new Float32Array( attr.position ),
 			3
 		)
 	); // задать координаты точек ( geometry.attributes.position.array )
 
-	if( attr.color !== undefined)
+	if( attr.color !== undefined )
 		geometry.setAttribute(
 			'color',
 			new THREE.BufferAttribute(
-				attr.color instanceof Float32Array ? attr.color
-													: new Float32Array( attr.color ),
+				attr.color instanceof Float32Array ? attr.color :
+				new Float32Array( attr.color ),
 				3
 			)
 		); // задать цвет точек
@@ -108,23 +116,26 @@ function getGeometryFromArray( attr ) {
 
 
 
-class CloudComponent {
-	constructor() {
-		this.parent 	= group;
-		this.positions 	= undefined;
-		this.geometry 	= undefined;
-		this.material 	= undefined;
-		this.mesh 		= undefined;
+class CloudComponent
+{
+	constructor()
+	{
+		this.parent = group;
+		this.positions = undefined;
+		this.geometry = undefined;
+		this.material = undefined;
+		this.mesh = undefined;
 	}
 
-	delete() {
+	delete()
+	{
 		this.parent.remove( this.mesh );
 		this.geometry.dispose();
 		this.material.dispose();
 		this.positions = undefined;
-		this.geometry  = undefined;
-		this.material  = undefined;
-		this.mesh 	   = undefined;
+		this.geometry = undefined;
+		this.material = undefined;
+		this.mesh = undefined;
 	}
 }
 
