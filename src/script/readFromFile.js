@@ -8,9 +8,9 @@ class Cloud extends CloudComponent
 	constructor( geometry, cParent = undefined, pSize = 4.0 )
 	{
 		super();
-		console.log( geometry );
 		this.positions = geometry.attributes.position.array; // массив позиций точек
 		this.colors = geometry.attributes.color ? geometry.attributes.color.array : undefined; // массив цветов точек
+		console.log( geometry );
 
 		// Материал точек
 		// Цвет точек будет определен атрибутом color в geometry,
@@ -318,11 +318,11 @@ function fileInput( e )
 			Cloud.inst[ fNum ].delete();
 		}
 
-		const cloudGroup = new THREE.Group(); // для группировки облака и его центра
-		group.add( cloudGroup );
+		// const cloudGroup = new THREE.Group(); // для группировки облака и его центра
+		// group.add( cloudGroup );
 
 		// Создать облако точек
-		Cloud.inst[ fNum ] = new Cloud( geometry, cloudGroup );
+		Cloud.inst[ fNum ] = new Cloud( geometry, group );
 		// Активировать/деактивировать очередные кнопки
 		if( Cloud.inst[ 0 ] !== undefined && Cloud.inst[ 1 ] !== undefined )
 			enableBtn( DOMInput.compare );
